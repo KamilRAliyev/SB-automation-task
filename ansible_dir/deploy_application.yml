@@ -1,0 +1,26 @@
+---
+- name: Server basic configurations
+  hosts: web
+  tasks:
+  - name: Update apt repo and cache
+    apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+  - name: apt-get update
+    command: apt-get update
+  - name: Install required packages
+    apt: name={{item}} state=latest
+    become: yes
+    with_items:
+    - vim
+    - python3-virtualenv
+    - pip
+
+- name: Install application requirements (pip)
+  hosts: web
+  tasks:
+  - name: Copy requirements.txt file
+    copy:
+      src: ../requirements.txt
+      dest: /root/requirements.txt
+  - name: Install dependencies
+    pip:
+      requirements: /root/requirements.txt
