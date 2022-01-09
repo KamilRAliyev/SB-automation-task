@@ -1,0 +1,16 @@
+# Virtual Environment
+venv/
+
+# Cache
+__pycache__/
+
+# SQL commands playground
+*.sql
+
+# Archive files
+*.tgz
+
+# Outputs
+src/outputs/results/*
+src/outputs/logs/*
+*.log
