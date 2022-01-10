@@ -68,4 +68,15 @@
       dest: /tmp/
       flat: yes
 
-
+- name: Reporting
+  hosts: web
+  tasks:
+  - name: Generate report from gathered_data.csv file
+    shell: python3 /root/app/reporting.py
+    register: report
+  - debug: msg={{report}}
+  - name: Fetch Report file to Ansible Server
+    fetch:
+      src: /root/app/outputs/report.pdf
+      dest: ../
+      flat: yes
