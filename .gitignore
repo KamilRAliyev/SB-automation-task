@@ -11,14 +11,14 @@ __pycache__/
 *.tgz
 
 # Outputs
-src/outputs/results/*
-src/outputs/logs/*
-src/outputs/plot/*
-*.log
-gathered_data.csv
-report.pdf
+# src/outputs/results/*
+# src/outputs/logs/*
+# src/outputs/plot/*
+# *.log
+# gathered_data.csv
+# report.pdf
 
 # Configurations
-hosts
-api.py
-db.py
+# hosts
+# api.py
+# db.py

@@ -30,6 +30,23 @@
     - [x] Implement fetch_data(function) method
     - [x] Store outputs in `/outputs/results`
     - [x] Implement push_to_database method
+
+---
+# How To Run?
+
+| No | Command | Description |
+|---|---|---|
+| 1. | `git clone https://github.com/KamilRAliyev/swedbank-automation-task.git` | Clone repo |
+| 2. | `cd swedbank-automation-task` | Go to project directory |
+| 3. | | Configure `./src/configurations/api.py` with API Key |
+| 4. | | Configure `./src/configurations/db.py` with DB parameters |
+| 4. | | Configure `./ansible_dir/hosts` file with Ubuntu Server |
+| 5. | `sh generate_tar.sh` | Generate archive |
+| 6. | `cd ansible_dir` | Go to ansible directory |
+| 7. | `ansible-playbook -i hosts deploy_application.yml` | Run ansible playbook |
+
 ---
 
-# Sequence Diagram
+# Output Examples:
+
+1. Report: [report.pdf](./examples/report.pdf)
