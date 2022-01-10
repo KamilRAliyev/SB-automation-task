@@ -4,6 +4,14 @@ import os
 import json
 from datetime import datetime
 
+ELEMENT_STRUCTURE = {
+            "open": "1. open",
+            "high": "2. high",
+            "low": "3. low",
+            "close": "4. close",
+            "volume": "5. volume"
+        }
+
 class ApiSeeder:
     api_url = "https://www.alphavantage.co/query?"
 
@@ -33,20 +41,33 @@ class ApiSeeder:
         with open(path, "w") as result_file:
             json.dump(self.data, result_file)
         result_file.close()
+
+    def _generate_values(self):
+        time_series = self.data["Monthly Time Series"]
+        insert_date = self.insert_date.strftime("%Y-%m-%d %H:%M:%S")
+        
+        lst = []
+
+        for count, value in enumerate(time_series):
+            element = time_series[value]
+
+            e_high = element[ELEMENT_STRUCTURE["high"]]
+            e_open = element[ELEMENT_STRUCTURE["open"]]
+            e_low = element[ELEMENT_STRUCTURE["low"]]
+            e_close = element[ELEMENT_STRUCTURE["close"]]
+            e_volume = element[ELEMENT_STRUCTURE["volume"]]
+
+            lst.append((self.stock_name, value, e_low, e_high, e_open, e_close, e_volume, insert_date))
+        
+        self.values = lst
+    
     
     def push_to_database(self):
         print(f"Push to database: {self.insert_date}")
-        # Structure of each record
-        ELEMENT_STRUCTURE = {
-            "open": "1. open",
-            "high": "2. high",
-            "low": "3. low",
-            "close": "4. close",
-            "volume": "5. volume"
-        }
-
-        time_series = self.data["Monthly Time Series"]
-
+        
+        values = self.values
+        
+        #command = "INSERT INTO stocks VALUES"
         conn = None
 
         try:
@@ -56,40 +77,16 @@ class ApiSeeder:
             # Creation cursor
             cursor = conn.cursor()
 
-            # Counter for inserted records
-            counter = None
+            args = ",".join(cursor.mogrify("(%s,%s,%s,%s,%s,%s,%s,%s)", i).decode('utf-8') for i in values)
 
-            insert_date = self.insert_date.strftime("%Y-%m-%d %H:%M:%S")
-            for count,time in enumerate(time_series):
-                element = time_series[time]
-
-                e_high = element[ELEMENT_STRUCTURE["high"]]
-                e_open = element[ELEMENT_STRUCTURE["open"]]
-                e_low = element[ELEMENT_STRUCTURE["low"]]
-                e_close = element[ELEMENT_STRUCTURE["close"]]
-                e_volume = element[ELEMENT_STRUCTURE["volume"]]
-
-                command = f"""
-                        INSERT INTO stocks(stock_name, stock_date, _low, _high, _open, _close, volume, insert_date)
-                        VALUES
-                        (
-                            '{self.stock_name}',
-                            '{time}',
-                            {e_low},
-                            {e_high},
-                            {e_open},
-                            {e_close},
-                            {e_volume},
-                            '{insert_date}'
-                        )"""
-                
-                cursor.execute(command)
-                counter = count
-            # Close communications
-            conn.close()
+            cursor.execute("INSERT INTO stocks(stock_name, stock_date, _low, _high, _open, _close, volume, insert_date) VALUES" + (args))
+            
             # Commit the changes
             conn.commit()
-            print(f" +   Inserted {counter} row(s).")
+
+            # Close communications
+            conn.close()
+            print(f" +   Inserted {len(values)} row(s).")
         except (Exception, psycopg2.DatabaseError) as error:
             print(" Error:", error)
         finally:
