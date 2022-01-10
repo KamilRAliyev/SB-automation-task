@@ -13,8 +13,10 @@ __pycache__/
 # Outputs
 src/outputs/results/*
 src/outputs/logs/*
+src/outputs/plot/*
 *.log
 gathered_data.csv
+report.pdf
 
 # Configurations
 hosts
