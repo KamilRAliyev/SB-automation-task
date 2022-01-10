@@ -1,3 +1,10 @@
+**Table of contents:**
+- [Task Description](#task-description)
+- [Workflow](#workflow)
+- [How To Run](#how-to-run)
+- [Output Examples](#output-examples)
+
+---
 # Task Description
 
 - [x]  REST API to get financial historic data about AAPL stocks
@@ -32,7 +39,7 @@
     - [x] Implement push_to_database method
 
 ---
-# How To Run?
+# How To Run
 
 | No | Command | Description |
 |---|---|---|
@@ -47,6 +54,6 @@
 
 ---
 
-# Output Examples:
+# Output Examples
 
 1. Report: [report.pdf](./examples/report.pdf)
