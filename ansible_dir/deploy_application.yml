@@ -24,3 +24,48 @@
   - name: Install dependencies
     pip:
       requirements: /root/requirements.txt
+
+- name: Deploy application
+  hosts: web
+  tasks:
+  - name: Make app directory
+    command: mkdir -p app
+  - name: Unpack archive file to Server
+    unarchive:
+      src: ../app.tgz
+      dest: /root/app/
+
+- name: Configure Database
+  hosts: web
+  tasks:
+  - name: Create stock table in db with current date
+    shell: python3 /root/app/config_db.py 1>> /root/app/outputs/logs/"config_db-`date '+%Y-%m-%d'`.log"
+  - name: Script log
+    shell: tail -5 /root/app/outputs/logs/"config_db-`date '+%Y-%m-%d'`.log"
+    register: config_db_log
+  - debug: msg={{config_db_log}}
+
+- name: Seed Database with monthly data
+  hosts: web
+  tasks:
+  - name: Run Seed Script
+    shell: python3 /root/app/push_monthly_data.py 1>> /root/app/outputs/logs/"push_monthly_data-`date '+%Y-%m-%d'`.log" 
+  - name: Script log
+    shell: tail -5 /root/app/outputs/logs/"push_monthly_data-`date '+%Y-%m-%d'`.log"
+    register: seed_monthly_data_log
+  - debug: msg={{seed_monthly_data_log}}
+
+- name: Automation for Gathered data csv file 
+  hosts: web
+  tasks:
+  - name: run gathered_data.py for generation of csv file
+    shell: python3 /root/app/gathered_data.py
+    register: result
+  - debug: msg={{result}}
+  - name: Fetch gathered_data.csv file to Ansible Server
+    fetch:
+      src: /root/app/outputs/gathered_data.csv
+      dest: /tmp/
+      flat: yes
+
+
